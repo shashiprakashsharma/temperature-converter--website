@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive Temperature Converter tool with real-time validation, absolute zero edge-case protection, and conversion formulas for Celsius, Fahrenheit, and Kelvin.">
+    <title>ThermoShift | Interactive Temperature Converter</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-moderate">
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-temperature-half"></i>
+                </div>
+                <div>
+                    <h1 class="logo-title">ThermoShift</h1>
+                    <p class="logo-subtitle">Precision Temperature Converter & Visualizer</p>
+                </div>
+            </div>
+            <div class="header-badge" id="thermalStateBadge">
+                <span class="badge-dot"></span>
+                <span id="thermalStateText">Moderate Temp</span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Left Side: Converter Panel -->
+            <section class="converter-card glass-panel">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-sliders"></i> Temperature Input</h2>
+                    <div class="live-toggle-container">
+                        <label class="switch-label" for="liveToggle">
+                            <span>Live Conversion</span>
+                            <div class="switch">
+                                <input type="checkbox" id="liveToggle" checked>
+                                <span class="slider round"></span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Input Controls -->
+                <form id="converterForm" onsubmit="return false;" class="input-form">
+                    <div class="input-group">
+                        <div class="field-container">
+                            <label for="tempInput">Temperature Value</label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="text" 
+                                    id="tempInput" 
+                                    placeholder="e.g. 25 or -10.5" 
+                                    autocomplete="off"
+                                    aria-describedby="errorMessage"
+                                    value="25"
+                                >
+                                <button type="button" id="clearBtn" class="clear-btn" title="Clear input" aria-label="Clear input">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="field-container unit-field">
+                            <label for="unitSelect">Select Unit</label>
+                            <div class="select-wrapper">
+                                <select id="unitSelect" aria-label="Temperature Unit Selector">
+                                    <option value="C" selected>Celsius (°C)</option>
+                                    <option value="F">Fahrenheit (°F)</option>
+                                    <option value="K">Kelvin (K)</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down select-arrow"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Convert Action Button -->
+                    <div class="action-row">
+                        <button type="button" id="convertBtn" class="btn btn-primary">
+                            <i class="fa-solid fa-bolt"></i> Convert Now
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Error / Warning Alert Box -->
+                <div id="errorMessage" class="error-box hidden" role="alert">
+                    <i class="fa-solid fa-circle-exclamation error-icon"></i>
+                    <div class="error-content">
+                        <strong id="errorTitle">Invalid Input</strong>
+                        <p id="errorText">Please enter a valid numeric value.</p>
+                    </div>
+                </div>
+
+                <!-- Presets / Quick Sample Buttons -->
+                <div class="presets-section">
+                    <span class="presets-label"><i class="fa-solid fa-bookmark"></i> Quick Presets:</span>
+                    <div class="presets-buttons">
+                        <button type="button" class="preset-btn" data-val="0" data-unit="C">Freezing (0°C)</button>
+                        <button type="button" class="preset-btn" data-val="20" data-unit="C">Room (20°C)</button>
+                        <button type="button" class="preset-btn" data-val="37" data-unit="C">Body (37°C)</button>
+                        <button type="button" class="preset-btn" data-val="100" data-unit="C">Boiling (100°C)</button>
+                        <button type="button" class="preset-btn preset-danger" data-val="-273.15" data-unit="C">Abs Zero (-273.15°C)</button>
+                    </div>
+                </div>
+
+                <!-- Results Display Area -->
+                <div class="results-section">
+                    <h3 class="results-title"><i class="fa-solid fa-square-poll-vertical"></i> Converted Outputs</h3>
+                    <div class="results-grid" id="resultsGrid">
+                        <!-- Celsius Card -->
+                        <div class="result-card" id="cardCelsius" data-unit="C">
+                            <div class="res-header">
+                                <span class="res-unit-name">Celsius</span>
+                                <span class="res-symbol">°C</span>
+                            </div>
+                            <div class="res-value-wrap">
+                                <span class="res-value" id="valCelsius">77.00</span>
+                                <span class="res-unit-tag">°C</span>
+                            </div>
+                            <button type="button" class="copy-btn" data-target="valCelsius" title="Copy value" aria-label="Copy Celsius Value">
+                                <i class="fa-regular fa-copy"></i> Copy
+                            </button>
+                        </div>
+
+                        <!-- Fahrenheit Card -->
+                        <div class="result-card" id="cardFahrenheit" data-unit="F">
+                            <div class="res-header">
+                                <span class="res-unit-name">Fahrenheit</span>
+                                <span class="res-symbol">°F</span>
+                            </div>
+                            <div class="res-value-wrap">
+                                <span class="res-value" id="valFahrenheit">77.00</span>
+                                <span class="res-unit-tag">°F</span>
+                            </div>
+                            <button type="button" class="copy-btn" data-target="valFahrenheit" title="Copy value" aria-label="Copy Fahrenheit Value">
+                                <i class="fa-regular fa-copy"></i> Copy
+                            </button>
+                        </div>
+
+                        <!-- Kelvin Card -->
+                        <div class="result-card" id="cardKelvin" data-unit="K">
+                            <div class="res-header">
+                                <span class="res-unit-name">Kelvin</span>
+                                <span class="res-symbol">K</span>
+                            </div>
+                            <div class="res-value-wrap">
+                                <span class="res-value" id="valKelvin">298.15</span>
+                                <span class="res-unit-tag">K</span>
+                            </div>
+                            <button type="button" class="copy-btn" data-target="valKelvin" title="Copy value" aria-label="Copy Kelvin Value">
+                                <i class="fa-regular fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: Visual Thermometer & Formula Breakdown -->
+            <section class="side-panel">
+                <!-- Visual Gauge Card -->
+                <div class="visualizer-card glass-panel">
+                    <h3><i class="fa-solid fa-flask-vial"></i> Thermal Visualizer</h3>
+                    <div class="thermometer-display">
+                        <div class="thermometer">
+                            <div class="stem">
+                                <div class="mercury-fill" id="mercuryFill" style="height: 45%;"></div>
+                                <div class="ticks">
+                                    <span>100°C</span>
+                                    <span>75°C</span>
+                                    <span>50°C</span>
+                                    <span>25°C</span>
+                                    <span>0°C</span>
+                                    <span>-50°C</span>
+                                </div>
+                            </div>
+                            <div class="bulb">
+                                <div class="bulb-core"></div>
+                            </div>
+                        </div>
+                        <div class="thermal-stats">
+                            <div class="stat-box">
+                                <span class="stat-label">Thermal Level</span>
+                                <span class="stat-value" id="thermalLevelText">Comfortable</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Physical State of H₂O</span>
+                                <span class="stat-value" id="waterStateText">Liquid</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Above Absolute Zero</span>
+                                <span class="stat-value" id="absZeroOffset">298.15 K</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formula Breakdown Card -->
+                <div class="formula-card glass-panel">
+                    <h3><i class="fa-solid fa-square-root-variable"></i> Formula Breakdown</h3>
+                    <div class="formula-box" id="formulaBox">
+                        <div class="formula-item">
+                            <span class="formula-title">Celsius to Fahrenheit</span>
+                            <code id="formulaCtoF">°F = (°C × 9/5) + 32</code>
+                        </div>
+                        <div class="formula-item">
+                            <span class="formula-title">Celsius to Kelvin</span>
+                            <code id="formulaCtoK">K = °C + 273.15</code>
+                        </div>
+                    </div>
+                    <div class="formula-explanation" id="formulaCalculationText">
+                        Calculation details will appear here.
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Toast notification for copy action -->
+        <div id="toast" class="toast hidden">
+            <i class="fa-solid fa-circle-check"></i>
+            <span id="toastMsg">Value copied to clipboard!</span>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>ThermoShift &copy; 2026 • Built with HTML5, CSS3 & Vanilla JavaScript</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
